@@ -1,0 +1,13 @@
+torch
+sentence-transformers
+langchain
+langgraph
+langchain_huggingface
+langchain-google-genai
+langchain_community
+python-dotenv
+beautifulsoup4     #Para leer sitios web
+pypdf            # Para leer PDFs
+faiss-cpu        # Para la base de datos vectorial
+notion-client    # Para la API de Notion
+
