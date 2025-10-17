@@ -44,6 +44,10 @@ Dentro del mismo debes agregar tus claves para cada API.
 Para cada servicio, debes tener una API KEY , como se menciona en el archivo .env.
 Completalo antes de ejecutar el proyecto
 
+### 6) Base de datos en Notion
+
+Debe crear una base de datos en Notion (tabla). Luego vincularla con la integracion y darle permisos de acceso.
+Más detalles en el documento del proyecto.
 
 
 ## Instrucciones de uso
