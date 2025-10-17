@@ -31,11 +31,11 @@ def create_knowledge_base():
         docs = []
         for loader in loaders:
             docs.extend(loader.load())
+
         #TODO limpiar documentos (quitar headers, footers, \n etc)
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         splits = text_splitter.split_documents(docs)
 
-        # --- ¡AQUÍ ESTÁ LA MAGIA! ---
         # 1. Definimos el modelo que vamos a usar de Hugging Face.
         model_name = "paraphrase-multilingual-MiniLM-L12-v2"
         # 2. Creamos la instancia de los embeddings.
@@ -55,6 +55,8 @@ def create_knowledge_base():
 def get_retriever():
     """
     Carga la base de conocimiento y el modelo de embedding local.
+    Usamos paraphrase-multilingual-MiniLM-L12-v2 de Hugging Face, pues es bueno, bonito y barato.
+    Regresa un objeto retriever listo para usarse en un RAG.
     """
     model_name = "paraphrase-multilingual-MiniLM-L12-v2"
     embeddings = HuggingFaceEmbeddings(model_name=model_name)
@@ -77,7 +79,7 @@ def get_timestamp():
 
 
 
-#  Herramienta de Persistencia en Notion TODO: configurar y probar  ---
+#  Herramienta de Persistencia en Notion
 def save_to_notion(query: str, response: str, sources: str, category: str):
     notion = Client(auth=os.getenv("NOTION_API_KEY"))
     database_id = os.getenv("NOTION_DATABASE_ID")
