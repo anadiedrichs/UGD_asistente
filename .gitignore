@@ -1,0 +1,13 @@
+# gitignore for proyecto-ugd-asistente
+ 
+ # Ignore environment variable files
+ .env
+# Ignore FAISS index directory
+faiss_index/
+
+ venv/
+__pycache__/
+*.pyc
+.DS_Store   
+
+
