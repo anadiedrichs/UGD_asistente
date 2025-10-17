@@ -1,0 +1,18 @@
+# .env
+# Gemini API Configuracion
+# https://aistudio.google.com/api-keys
+GEMINI_API_KEY="tu_gemini_api_key_aqui"
+
+
+# --- Variables para LangSmith Opcional
+# langsmith es una plataforma para rastrear y gestionar tus interacciones con modelos de lenguaje.
+# Puedes registrarte en https://langchain.com/langsmith y obtener una clave API.
+LANGCHAIN_TRACING_V2="true"
+LANGCHAIN_API_KEY="TU_LANGCHAIN_API_KEY_AQUI"
+LANGCHAIN_PROJECT="default" # Nombre del proyecto en LangSmith
+
+#---- Notion API KEY 
+# https://developers.notion.com/docs/create-a-notion-integration
+
+NOTION_API_KEY="TU_NOTION_API_KEY_AQUI"
+NOTION_DATABASE_ID="TU_NOTION_DATABASE_ID_AQUI"
