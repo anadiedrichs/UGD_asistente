@@ -1,21 +1,32 @@
-import os
+# ___Herramientas del proyecto___
+'''
+    Este .py contiene las funciones de soporte que permiten al 
+    agente interactuar. Se crea la base de conocimiento vectorial (FAISS)
+    y la base de datos de auditoría (Notion)
+'''
 import datetime
-from langchain_community.vectorstores import FAISS
+import os
+
+# dotenv para cargar variables de entorno
+from dotenv import find_dotenv, load_dotenv
 from langchain_community.document_loaders import PyPDFLoader, WebBaseLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
 # Importa la clase de embeddings de Google
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 # para los embeddings locales con Hugging Face
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 # notion
 from notion_client import Client
-# dotenv para cargar variables de entorno
-from dotenv import load_dotenv, find_dotenv
 
+'''
+    La siguiente función 'create_knowledge_base' es la encargada de crear
+    la base de conocimiento usando un modelo de embedding local
+    de Hugging Face. La cual carga documentos cruciales para el
+    funcionamiento del Agente Digital
+
+'''
 def create_knowledge_base():
-    """
-    Crea la base de conocimiento usando un modelo de embedding local de Hugging Face.
-    """
     db_path = "faiss_index"
     if not os.path.exists(db_path):
         print("Creando la base de conocimiento con modelo local...")
@@ -52,17 +63,28 @@ def create_knowledge_base():
     else:
         print("La base de conocimiento ya existe. No se realizaron cambios.")
 
+
+'''
+    La siguiente función 'get_retriever' carga la base de conocimiento
+    y el modelo de embedding local.
+    Usamos 'paraphrase-multilingual-MiniLM-L12-v2' de Hugging Face, 
+    pues es bueno, bonito y barato.
+
+    Retorna un objeto retriever listo para usarse en un RAG.
+'''
 def get_retriever():
-    """
-    Carga la base de conocimiento y el modelo de embedding local.
-    Usamos paraphrase-multilingual-MiniLM-L12-v2 de Hugging Face, pues es bueno, bonito y barato.
-    Regresa un objeto retriever listo para usarse en un RAG.
-    """
+
     model_name = "paraphrase-multilingual-MiniLM-L12-v2"
     embeddings = HuggingFaceEmbeddings(model_name=model_name)
     vectorstore = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
     return vectorstore.as_retriever()
 
+
+'''
+    La siguiente función 'get_timestamp' formatea la fecha y hora a un formato ISO 8601,
+    ajustado a la zona horaria UTC-3, ya que es el formato que la API de Notion
+    necesita para los campos de tipo Date.
+'''
 def get_timestamp():
     
     # 1. Crear un objeto de zona horaria para UTC-3
@@ -80,6 +102,13 @@ def get_timestamp():
 
 
 #  Herramienta de Persistencia en Notion
+'''
+    La siguiente función ‘save_to_notion’ es la encargada de registrar cada interacción
+    en una base de datos de Notion para auditoria. Como herramientas usa el cliente de notion
+    ‘notion_client’ y requiere 2 variables de entorno como lo son ‘NOTION_API_KEY’ y ‘NOTION_DATEBASE_ID’
+
+    Almacena la query, response, sources y la category de la consulta.
+'''
 def save_to_notion(query: str, response: str, sources: str, category: str):
     notion = Client(auth=os.getenv("NOTION_API_KEY"))
     database_id = os.getenv("NOTION_DATABASE_ID")
@@ -103,7 +132,14 @@ def save_to_notion(query: str, response: str, sources: str, category: str):
     except Exception as e:
         print(f"Error al guardar en Notion: {e}")
         return "Error al guardar el informe en Notion."
-        
+
+
+
+
+
+
+
+
 # Bloque de prueba para ejecutar este archivo directamente
 if __name__ == "__main__":
     print("Ejecutando prueba de tools.py...")
@@ -113,3 +149,4 @@ if __name__ == "__main__":
     create_knowledge_base()
 
     print("Prueba finalizada.")
+
