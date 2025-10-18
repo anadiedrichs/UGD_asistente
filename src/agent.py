@@ -1,13 +1,28 @@
+
+# ___Cabeza del Agente___
+'''
+    Este .py define la lógica del flujo de trabajo, para saber 
+    cuál va a ser el camino a seguir para la pregunta desde que 
+    se recibe hasta que el agente genera una respuesta.
+    Aquí LangGraph se utiliza para secuenciar las acciones del agente digital.
+'''
 import os
-from typing import TypedDict, List
+from typing import List, TypedDict
 from langchain_core.prompts import ChatPromptTemplate
+
 # Importa el modelo de chat de Google (Gemini)
-from langchain_google_genai import ChatGoogleGenerativeAI 
-from langgraph.graph import StateGraph, END
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langgraph.graph import END, StateGraph
+
 # Importa las herramientas necesarias de tools.py
 from .tools import get_retriever, save_to_notion
 
+
 # --- 1. Definición del Estado del Grafo ---
+'''
+    La siguiente clase 'GraphState' funciona como 'almacenamiento de memoria'
+    que comparte información entre los agentes
+'''
 class GraphState(TypedDict):
     question: str
     documents: List[str]
@@ -16,6 +31,14 @@ class GraphState(TypedDict):
 
 # --- 2. Definición de los Nodos (Agentes) ---
 
+'''
+    La siguiente función 'retrieve_documents' funciona como un 'Agente Buscador'
+    el cual para buscar documentos utilizar 'get_retriever' (definida en tools.py)
+    para buscar en la base de conocimiento los fragmentos de texto más relevantes para la pregunta.
+
+    Retorna la lista de documentos y fuentes encontradas al estado.
+
+'''
 def retrieve_documents(state):
     print("---Buscando documentos relevantes---")
     question = state["question"]
@@ -27,11 +50,19 @@ def retrieve_documents(state):
     print(documents)
     return {"documents": documents, "question": question, "sources": list(set(sources))}
 
+
+'''
+    La siguiente función 'generate_response' funciona como un 
+    ' Agente Redactor Empático de la Unidad de Género y Diversidad '
+    el cual toma la pregunta y los documentos para combinar en un prompt para el modelo de IA.
+    El modelo de IA utilizado es Gemini 2.5 Flash de Google. 
+    El modelo se configura como un asistente empático que únicamente
+    responde con el contexto proporcionado y debe citar las fuentes.
+
+    Retorna la respuesta generada al estado.
+
+'''
 def generate_response(state):
-    """
-    Nodo 2: "Redactor Empático UGD".
-    Genera una respuesta usando el modelo Gemini.
-    """
     print("---Generando respuesta---")
     question = state["question"]
     documents = state["documents"]
@@ -56,16 +87,20 @@ def generate_response(state):
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("La variable de entorno GEMINI_API_KEY no fue encontrada.")
-    
+        
     # Usa el modelo de chat de Gemini
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", 
-                                 temperature=0, 
-                                 api_key=api_key)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0, api_key=api_key)
     chain = prompt | llm
-    
+        
     generation = chain.invoke({"context": "\n\n".join(documents), "question": question}).content
     return {"generation": generation}
 
+
+'''
+    La siguiente función 'persist_report' funciona como un ' Agente Documentador'
+    el cual utiliza la herramienta 'save_to_notion' (definida en tools.py)
+    para guardar toda la interacción completa en la BD de Notion.
+'''
 def persist_report(state):
     
     print("---Guardando en Notion---")
@@ -78,6 +113,14 @@ def persist_report(state):
     return {}
 
 # --- 3. Construcción del Grafo 
+
+'''
+    La Funcion 'build_graph' es la encargada de ensamblar a los agentes para generar el flujo de trabajo.
+    Inicializo el flujo de trabajo llamando a 'StateGraph' y utilizando la definición de 'GraphState'. 
+    Agrego las 3 subrutinas al flujo de trabajo. 
+
+    Retorna la secuencia lineal: retrieve -> generarte -> persist -> END.
+'''
 def build_graph():
     
     workflow = StateGraph(GraphState)
