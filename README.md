@@ -49,7 +49,9 @@ Completalo antes de ejecutar el proyecto
 Debe crear una base de datos en Notion (tabla). Luego vincularla con la integracion y darle permisos de acceso.
 Más detalles en el documento del proyecto.
 
+## Documento del proyecto
 
+[Enlace al documento sobre el proyecto entregado para el curso IA Generativa](https://docs.google.com/document/d/1zo5Q9xwiBNCatrMsCQlI9YM2j910zqmnmZywbSGWsLQ/edit?usp=sharing)
 ## Instrucciones de uso
 
 En tu terminal, dentro de la carpeta del proyecto, ejecuta la siguiente línea para correr el proyecto:
