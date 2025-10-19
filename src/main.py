@@ -20,6 +20,10 @@ def main():
         question = input(">> ")
         if question.lower() in ["salir", "exit"]:
             break
+
+        if not question:
+            print("⚠️  Por favor, escribe una pregunta válida.\n")
+            continue
         
         # Invocar el grafo con la pregunta del usuario
         inputs = {"question": question}
