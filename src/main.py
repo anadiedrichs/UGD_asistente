@@ -39,8 +39,17 @@ def main():
     
     while True:
         question = input(">> ")
+        
+        # Eliminar espacios en blanco al inicio y final
+        question = question.strip()
+        
         if question.lower() in ["salir", "exit"]:
             break
+        
+        # Verificar si el input está vacío después de strip()
+        if not question:
+            print("⚠️  Por favor, escribe una pregunta válida.\n")
+            continue
         
         # Invocar el grafo con la pregunta del usuario
         inputs = {"question": question}
